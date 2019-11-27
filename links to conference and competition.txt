@@ -1,0 +1,5 @@
+conference:
+https://attend.ieee.org/southeastcon-2020/
+
+Hardware competition:
+https://github.com/ncgadgetry/southeastcon2020
