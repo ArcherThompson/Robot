@@ -17,6 +17,16 @@
 const int onTime = 100; //time to hold button
 const int cycleTime = 150; // minium full cycle time
 const long matchTime = 190000; //3 minutes plus 10 secound buffer
+
+/**
+ * Intial variable set up
+ **/
+int piDigit = 0;
+int buttonValue = 3;
+int currentT=0;
+// end 
+
+
 /**
  * Function to press buttons
  * 
@@ -97,9 +107,8 @@ void prS(int buttonValue) {
     digitalWrite( S8, LOW);
     }
 
-    else if(buttonValue == 9) {
+  else if(buttonValue == 9) {
     //Press 9
-
     digitalWrite( S9, HIGH);
     delay(onTime);
     digitalWrite( S9, LOW);
@@ -108,30 +117,50 @@ void prS(int buttonValue) {
 //end function
 
 
-/**
- * Intial variable set up
- **/
-int piDigit = 0;
-int buttonValue = 3;
-int currentT=0;
-// end varibles
 
+void lowerArms(){
+  while(!(armSwitch)) { //uncomment when armSwitch is defined and pinstate is set to read
+    digitalWrite(armMotor, HIGH);//uncomment when armMotor is defined and pinstate is set to write
+  }
+  digitalWrite(armMotor, LOW);
+}
 
-void setup() {              
+void wait() {
+  while(!(start))
+  {
+    delay(1);
+  }
+}
+
+void setup() {  
+  pinMode( S0, OUTPUT );
+  pinMode( S1, OUTPUT );
+  pinMode( S2, OUTPUT );
+  pinMode( S3, OUTPUT );
+  pinMode( S4, OUTPUT );
+  pinMode( S5, OUTPUT );
+  pinMode( S6, OUTPUT );
+  pinMode( S7, OUTPUT );
+  pinMode( S8, OUTPUT );
+  pinMode( S9, OUTPUT );
+            
   Serial.begin(9600);
-  
+  // something to make robot wait till its go time.
+  bool wakeUp=0;
+  while(!(wakeUp)) {
+    if (Serial.available() > 0) {
+    // read the incoming byte:
+    wakeUp = Serial.read();
+  }
+  }
+  bool lowerArms=0;
   int startTimestamp = millis();
+  if (Serial.available() > 0) {
+    lowerArms = Serial.read(); }
+  if (lowerArms == 1); {
+    lowerArms(); } // this lowers the arm
+  wait();
 
-pinMode( S0, OUTPUT );
-pinMode( S1, OUTPUT );
-pinMode( S2, OUTPUT );
-pinMode( S3, OUTPUT );
-pinMode( S4, OUTPUT );
-pinMode( S5, OUTPUT );
-pinMode( S6, OUTPUT );
-pinMode( S7, OUTPUT );
-pinMode( S8, OUTPUT );
-pinMode( S9, OUTPUT );
 }
 
 void loop() {
@@ -144,9 +173,9 @@ void loop() {
         piDigit++;
         //check to make sure that that we do not activate next value before areana is ready
         //this will not be nessesary with solonoids most likely.
-      if (millis()-currentT <cycleTime) {
-        delay(150-(millis()-currentT));
-      }
+        if (millis()-currentT < cycleTime) {
+          delay(cycleTime-(millis()-currentT));
+        }
     }
     //Serial.print("\n");  //debug only
     //Serial.print(piDigit); //debug only
